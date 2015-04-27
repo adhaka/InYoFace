@@ -1,6 +1,6 @@
 function [im, ii_im] = LoadIm(im_name)
 
-im = double( imread(im_name) );
+im = double(rgb2gray(imread(im_name)));
 
 % Normalize the image:
 mu = mean(im(:));
