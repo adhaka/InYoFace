@@ -5,7 +5,7 @@ b = [y+h, x-1];
 c = [y-1, x+w];
 d = [y+h, x+w];
 
-b_vec = zeros(W*H, 1);
+b_vec = zeros(W*H, 1)';
 
 if y ~= 1 && x ~= 1
     b_vec((a(2)-1) * H + a(1)) = 1;
