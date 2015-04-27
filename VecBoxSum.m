@@ -1,11 +1,11 @@
 function b_vec = VecBoxSum(x, y, w, h, W, H)
 
 a = [y-1, x-1];
-b = [y+h, x-1];
-c = [y-1, x+w];
-d = [y+h, x+w];
+b = [y+h-1, x-1];
+c = [y-1, x+w-1];
+d = [y+h-1, x+w-1];
 
-b_vec = zeros(W*H, 1)';
+b_vec = zeros(1, W*H);
 
 if y ~= 1 && x ~= 1
     b_vec((a(2)-1) * H + a(1)) = 1;
