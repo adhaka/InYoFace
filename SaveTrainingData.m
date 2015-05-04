@@ -4,7 +4,7 @@ facesDir = 'data/TrainingImages/FACES/';
 nonfacesDir = 'data/TrainingImages/NFACES/';
 
 % Load images
-if nVararg > 0
+if length(varargin) > 0
     numImages = varargin{1};
     face_ii = LoadImDataDir(facesDir,numImages);
     nonface_ii = LoadImDataDir(nonfacesDir,numImages);
@@ -24,5 +24,5 @@ fmat = VecAllFeatures(all_ftypes, W, H);
 ii_ims = ii_ims(:,train_inds);
 ys = ys(train_inds);
 
-save(s_fn, 'ii_ims', 'fmat', 'all_ftypes', 'W', 'H');
+save(s_fn, 'ii_ims', 'fmat', 'all_ftypes', 'W', 'H', 'ys');
 end
