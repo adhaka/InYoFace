@@ -12,7 +12,7 @@ inds = ys == -1;
 w(inds) = 1/(2*m);
 w(~inds) = 1/(2*(n-m));
 
-fmat = Tdata.fmat(1:1000,:);
+fmat = Tdata.fmat(:,:);
 all_ftypes = Tdata.all_ftypes;
 [featcount, ~]= size(fmat);
 
