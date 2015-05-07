@@ -5,7 +5,7 @@ ys = Tdata.ys;
 outfmat = zeros(T, size(Tdata.fmat, 2));
 outftypes = zeros(T, size(Tdata.all_ftypes, 2));
 
-m = sum(Tdata.ys(:) == -1);
+m = sum(Tdata.ys == -1);
 n = size(Tdata.ys, 2);
 w = zeros(1,n);
 inds = ys == -1;
@@ -14,13 +14,14 @@ w(~inds) = 1/(2*(n-m));
 
 fmat = Tdata.fmat(1:1000,:);
 all_ftypes = Tdata.all_ftypes;
-[featcount, x]= size(fmat);
+[featcount, ~]= size(fmat);
 
 for t = 1:T
 %     w = w/sum(w);
     ps = zeros(1, featcount);
     errval = zeros(1, featcount);
     thetaval = zeros(1, featcount);
+    % maybe this can be done without a loop
     for j = 1:featcount
         fw = fmat(j,:);
         fs = fw * Tdata.ii_ims;
@@ -38,7 +39,7 @@ for t = 1:T
     
     alphas(t) = 0.5*log((1-minerr)/minerr);
 
-    hs = (ps(minind) * fmat(minind, :) * Tdata.ii_ims < ps(minind) * thetaerr) * 2  - 1;
+    hs = (ps(minind) .* fmat(minind, :) * Tdata.ii_ims < ps(minind) * thetaerr) * 2  - 1;
     
     w = w .* exp(-alphas(t) * ys .* hs );
     w = w/sum(w);
