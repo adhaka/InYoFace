@@ -22,17 +22,16 @@ for t = 1:T
     errval = zeros(1, featcount);
     thetaval = zeros(1, featcount);
     % maybe this can be done without a loop
+    fw = fmat * Tdata.ii_ims;
     for j = 1:featcount
-        fw = fmat(j,:);
-        fs = fw * Tdata.ii_ims;
-        [theta, ps(j) , err] = LearnWeakClassifier(w, fs, ys);
-        thetaval(j) = theta; 
-        errval(j) = err;
+        %fw = fmat(j,:);
+        fs = fw(j,:);%fw * Tdata.ii_ims;
+        [thetaval(j), ps(j) , errval(j)] = LearnWeakClassifier(w, fs, ys);
     end
     
     [minerr, minind] = min(errval);
     thetaerr = thetaval(minind);
-    disp(minind);
+    %disp(minind);
     Thetas(t,1) = minind;
     Thetas(t,2) = thetaerr;
     Thetas(t,3) = ps(minind);
