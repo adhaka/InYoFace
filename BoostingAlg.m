@@ -15,6 +15,8 @@ w(~inds) = 1/(2*(n-m));
 fmat = Tdata.fmat(:,:);
 all_ftypes = Tdata.all_ftypes;
 [featcount, ~]= size(fmat);
+% Feature responses
+fw = fmat * Tdata.ii_ims;
 
 for t = 1:T
 %     w = w/sum(w);
@@ -22,10 +24,8 @@ for t = 1:T
     errval = zeros(1, featcount);
     thetaval = zeros(1, featcount);
     % maybe this can be done without a loop
-    fw = fmat * Tdata.ii_ims;
     for j = 1:featcount
-        %fw = fmat(j,:);
-        fs = fw(j,:);%fw * Tdata.ii_ims;
+        fs = fw(j,:);
         [thetaval(j), ps(j) , errval(j)] = LearnWeakClassifier(w, fs, ys);
     end
     
