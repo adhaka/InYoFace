@@ -24,5 +24,5 @@ fmat = VecAllFeatures(all_ftypes, W, H);
 ii_ims = ii_ims(:,train_inds);
 ys = ys(train_inds);
 
-save(s_fn, 'ii_ims', 'fmat', 'all_ftypes', 'W', 'H', 'ys');
+save(s_fn, 'ii_ims', 'fmat', 'all_ftypes', 'W', 'H', 'ys', 'train_inds');
 end
