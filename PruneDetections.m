@@ -4,7 +4,7 @@ nd = size(dets,1);
 % intersections
 intersectionArea = rectint(dets,dets);
 % unions
-detArea = sum(dets(:,3:4),2);
+detArea = dets(:,3).*dets(:,4);
 unionArea = repmat(detArea,1,nd) + repmat(detArea',nd,1).*(intersectionArea>0) - intersectionArea;
 % overlappers
 D = ( intersectionArea / unionArea ) > rho;
