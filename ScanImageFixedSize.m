@@ -1,34 +1,45 @@
 function dets = ScanImageFixedSize(Cparams, im)
 
-%im = imread(im_name);
-im1 = double(rgb2gray(im));
-[H, W] = size(im1);
+% Transform to grayscale
+if (size(im,3)==3)
+    im = rgb2gray(im);
+end
+im = double(im);
+[H, W] = size(im);
+% integral images
+ii_im = cumsum(cumsum(im,1),2);
+ii_im2 = cumsum(cumsum(im.*im,1),2);
 
-im1 = (im1 - mean(im1(:))) / max(realmin, std(im1(:)));
-im2 = im1 .* im1;
+h = 19; 
+w = 19;
+dets = zeros((H-h-1)*(W-w-1),4);
+p = 1;
 
-ii_im1 = cumsum(cumsum(im1, 1), 2);
-ii_im2 = cumsum(cumsum(im2, 1), 2);
-
-i = 1;
-subws = zeros(361, (W-2)*(H-2));
-all_patches = zeros((W-2)*(H-2), 4);
-
-for x = 2:W-19-1
-    for y = 2:H-19-1
-        s1 = ii_im1(y-1, x-1) - ii_im1(y+19-1, x-1) - ii_im1(y-1, x+19-1) + ii_im1(y+19-1, x+19-1);
-        s2 = ii_im2(y-1, x-1) - ii_im2(y+19-1, x-1) - ii_im2(y-1, x+19-1) + ii_im2(y+19-1, x+19-1);
-        mu = s1 / 361;
-        sigma = (s2 - 361*mu*mu) / 360;
-        subw = (ii_im1(y:y+19-1, x:x+19-1) - mu) / sigma;
-        subws(:,i) = subw(:);
-        all_patches(i,:) = [x, y, 19, 19];
-        i = i+1;
+for y=1:H-19+1 %20
+    for x=1:W-19+1 %20
+        patch = ii_im(y:y+h-1,x:x+w-1);
+        mu = patch(end,end);
+        sigma2 = ii_im2(y+h-1,x+w-1);
+        if x~=1
+            mu = mu - ii_im(y+h-1,x-1);
+            sigma2 = sigma2 - ii_im2(y+h-1,x-1);
+        end
+        if y~=1
+            mu = mu - ii_im(y-1,x+w-1);
+            sigma2 = sigma2 - ii_im2(y-1,x+w-1);
+        end
+        if x~=1 && y~=1
+            mu = mu + ii_im(y-1,x-1);
+            sigma2 = sigma2 + ii_im2(y-1,x-1);
+        end
+        mu = mu/(w*h);
+        sigma = sqrt(abs((sigma2 - w*h*mu*mu)/(w*h-1)));
+        
+        if ApplyDetectorAdapt(Cparams, patch(:), mu, sigma) > Cparams.thresh
+            dets(p,:) = [x,y,w,h];
+            p=p+1;
+        end
     end
 end
-
-det_ids = ApplyDetector(Cparams, subws) > 3;
-dets = all_patches(det_ids,:);
-
+dets = dets(1:p-1,:);
 end
-
