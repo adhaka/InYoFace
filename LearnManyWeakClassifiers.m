@@ -1,25 +1,18 @@
 function [thetas, p, err] = LearnManyWeakClassifiers(ws, fs, ys)
 [nF, N] = size(fs);
-%tic
-% mus_p =  sum(repmat(ws .* (1 + ys),nF,1) .* fs,2) ./ sum(ws .* (1 + ys));
-% mus_n =  sum(repmat(ws .* (1 - ys),nF,1) .* fs,2) ./ sum(ws .* (1 - ys));
-%toc
-tic
-mus_p =  sum(bsxfun(@times, fs, ws .* (1 + ys)),2) / (ws * (1 + ys)');
-mus_n =  sum(bsxfun(@times, fs, ws .* (1 - ys)),2) / (ws * (1 - ys)');
-toc
-tic
+
+mus_p =  sum(bsxfun(@times, fs, ws .* (1 + ys)),2) / sum(ws .* (1 + ys));
+mus_n =  sum(bsxfun(@times, fs, ws .* (1 - ys)),2) / sum(ws .* (1 - ys));
+
 thetas = 0.5 * (mus_p + mus_n);
-thetamat = repmat(thetas,1,N);
 
-gss_n = (-1 * fs < - thetamat) * 2 - 1;
-gss_p = (fs < thetamat) * 2 - 1;
+gss_n = bsxfun(@gt,fs,thetas)*2 - 1;
+gss_p = bsxfun(@lt,fs,thetas)*2 - 1;
 
-ysmat = repmat(ys,nF,1);
-errs_n = 0.5 * abs(ysmat-gss_n) * ws';
-errs_p = 0.5 * abs(ysmat-gss_p) * ws';
+errs_n = 0.5 * abs(bsxfun(@minus,gss_n,ys)) * ws';
+errs_p = 0.5 * abs(bsxfun(@minus,gss_p,ys)) * ws';
 
-inds = find(errs_n < errs_p);
+inds = errs_n < errs_p;
 p = zeros(nF, 1);
 err = zeros(nF, 1);
 
