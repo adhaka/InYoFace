@@ -18,36 +18,51 @@ all_ftypes = Tdata.all_ftypes;
 % Feature responses
 fw = fmat * Tdata.ii_ims;
 
+ps = zeros(1, featcount);
+errval = zeros(1, featcount);
+thetaval = zeros(1, featcount);
 for t = 1:T
-%     w = w/sum(w);
-    ps = zeros(1, featcount);
-    errval = zeros(1, featcount);
-    thetaval = zeros(1, featcount);
-    % maybe this can be done without a loop
     for j = 1:featcount
         fs = fw(j,:);
-        [thetaval(j), ps(j) , errval(j)] = LearnWeakClassifier(w, fs, ys);
+        mu_p = sum(w .* (1 + ys) .* fs) / sum(w .* (1 + ys));
+        mu_n = sum(w .* (1 - ys) .* fs) / sum(w .* (1 - ys));
+
+        theta = 0.5 * (mu_p + mu_n);
+
+        gs_n = (-1 * fs < -theta) * 2 - 1;
+        gs_p = (fs < theta) * 2 - 1;
+
+        err_n = 0.5 * sum(w .* abs(ys - gs_n));
+        err_p = 0.5 * sum(w .* abs(ys - gs_p));
+
+        if err_n < err_p
+            ps(j) = -1;
+            errval(j) = err_n;
+        else
+            ps(j) = 1;
+            errval(j) = err_p;
+        end
+        thetaval(j) = theta;
+        %[thetaval(j), ps(j) , errval(j)] = LearnWeakClassifier(w, fw(j,:), ys);
     end
-    
+
     [minerr, minind] = min(errval);
     thetaerr = thetaval(minind);
     %disp(minind);
     Thetas(t,1) = minind;
     Thetas(t,2) = thetaerr;
     Thetas(t,3) = ps(minind);
-    
+
     alphas(t) = 0.5*log((1-minerr)/minerr);
 
     hs = (ps(minind) .* fmat(minind, :) * Tdata.ii_ims < ps(minind) * thetaerr) * 2  - 1;
-    
+
     w = w .* exp(-alphas(t) * ys .* hs );
     w = w/sum(w);
 
     outfmat(t,:) = fmat(minind,:);
     outftypes(t,:) = all_ftypes(minind,:);
-    
 end
-% disp(w);
 
 Cparams.alphas = alphas;
 Cparams.Thetas = Thetas;
