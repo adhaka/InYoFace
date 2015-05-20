@@ -20,7 +20,7 @@ ys = [ones(1,size(face_ii,2)), -ones(1,size(nonface_ii,2))];
 % get the features
 W = 19;  %%%% HARD CODED!!!! %%%%%% This is lame.
 H = 19;
-fmat = VecAllFeatures(all_ftypes, W, H);
+fmat = sparse(VecAllFeatures(all_ftypes, W, H));
 ii_ims = ii_ims(:,train_inds);
 ys = ys(train_inds);
 
