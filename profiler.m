@@ -3,7 +3,7 @@ profile on
 Tdata=load('training_data.mat');
 Tdata.fmat = sparse(Tdata.fmat);
 tic
-Dparams = BoostingAlg(Tdata, 1);
+Dparams = BoostingAlg(Tdata, 10);
 toc
 profile viewer
 p = profile('info');

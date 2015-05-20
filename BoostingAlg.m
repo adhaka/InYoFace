@@ -7,7 +7,7 @@ outftypes = zeros(T, size(Tdata.all_ftypes, 2));
 
 m = sum(ys == -1);
 n = size(ys, 2);
-w = zeros(1,n);
+w = zeros(n,1);
 inds = ys == -1;
 w(inds) = 1/(2*m);
 w(~inds) = 1/(2*(n-m));
@@ -16,20 +16,29 @@ fmat = Tdata.fmat;
 all_ftypes = Tdata.all_ftypes;
 [featcount, ~]= size(fmat);
 % Feature responses
-fw = fmat * Tdata.ii_ims;
+fw = (fmat * Tdata.ii_ims)';
 
 ps = zeros(1, featcount);
 errval = zeros(1, featcount);
 thetaval = zeros(1, featcount);
+
+ys = ys';
+ysp = (1+ys);
+ysn = (1-ys);
 for t = 1:T
+    t
     for j = 1:featcount
-        fs = fw(j,:);
-        mu_p = sum(w .* (1 + ys) .* fs) / sum(w .* (1 + ys));
-        mu_n = sum(w .* (1 - ys) .* fs) / sum(w .* (1 - ys));
+        fs = fw(:,j);
+         
+        wysp = w.*ysp;
+        wysn = w.*ysn;
+
+        mu_p = sum(wysp .* fs) / sum(wysp);
+        mu_n = sum(wysn .* fs) / sum(wysn);
 
         theta = 0.5 * (mu_p + mu_n);
 
-        gs_n = (-1 * fs < -theta) * 2 - 1;
+        gs_n = (fs > theta) * 2 - 1;
         gs_p = (fs < theta) * 2 - 1;
 
         err_n = 0.5 * sum(w .* abs(ys - gs_n));
@@ -43,7 +52,6 @@ for t = 1:T
             errval(j) = err_p;
         end
         thetaval(j) = theta;
-        %[thetaval(j), ps(j) , errval(j)] = LearnWeakClassifier(w, fw(j,:), ys);
     end
 
     [minerr, minind] = min(errval);
@@ -57,7 +65,7 @@ for t = 1:T
 
     hs = (ps(minind) .* fmat(minind, :) * Tdata.ii_ims < ps(minind) * thetaerr) * 2  - 1;
 
-    w = w .* exp(-alphas(t) * ys .* hs );
+    w = w .* exp(-alphas(t) * ys .* hs' );
     w = w/sum(w);
 
     outfmat(t,:) = fmat(minind,:);
