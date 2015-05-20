@@ -42,4 +42,5 @@ for y=1:H-19+1 %20
     end
 end
 dets = dets(1:p-1,:);
+
 end
