@@ -11,12 +11,17 @@ psmat = repmat(ps, 1, numIms);
 
 ffin = (fmat * ii_ims) ./ sigma;
 
+indx = all_ftypes(:,1) == 3;
+% size(indx)
+% size(ffin)
+% size(all_ftypes)
 
-for i = 1:size(all_ftypes)
-    if all_ftypes(i, 1) == 3
-        ffin(i) = ffin(i) + all_ftypes(i,4) * all_ftypes(i,5) * mu/ sigma;
-    end
-end
+ffin(indx) = ffin(indx) + all_ftypes(indx,4) .* all_ftypes(indx,5) * mu/ sigma;
+% for i = 1:size(all_ftypes)
+%     if all_ftypes(i, 1) == 3
+%         ffin(i) = ffin(i) + all_ftypes(i,4) * all_ftypes(i,5) * mu/ sigma;
+%     end
+% end
 
 Thetamat = repmat(ps .* Thetas, 1, numIms);
 Alphamat = repmat(Alphas, 1, numIms);
