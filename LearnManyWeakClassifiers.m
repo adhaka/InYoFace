@@ -6,11 +6,11 @@ mus_n =  sum(bsxfun(@times, fs, ws .* (1 - ys)),2) / sum(ws .* (1 - ys));
 
 thetas = 0.5 * (mus_p + mus_n);
 
-gss_n = bsxfun(@gt,fs,thetas)*2 - 1;
-gss_p = bsxfun(@lt,fs,thetas)*2 - 1;
-
-errs_n = 0.5 * abs(bsxfun(@minus,gss_n,ys)) * ws';
-errs_p = 0.5 * abs(bsxfun(@minus,gss_p,ys)) * ws';
+gss_n = (bsxfun(@gt,fs,thetas))'*2 - 1;
+gss_p = (bsxfun(@lt,fs,thetas))'*2 - 1;
+ys=ys';
+errs_n = 0.5 * ws * abs(bsxfun(@minus,gss_n,ys));
+errs_p = 0.5 * ws * abs(bsxfun(@minus,gss_p,ys));
 
 inds = errs_n < errs_p;
 p = zeros(nF, 1);

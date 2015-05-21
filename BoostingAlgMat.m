@@ -4,7 +4,7 @@ Thetas = zeros(T, 3);
 ys = Tdata.ys;
 outfmat = zeros(T, size(Tdata.fmat, 2));
 outftypes = zeros(T, size(Tdata.all_ftypes, 2));
-
+ 
 m = sum(ys == -1);
 n = size(ys, 2);
 w = zeros(1,n);
@@ -14,7 +14,7 @@ w(~inds) = 1/(2*(n-m));
 
 fmat = Tdata.fmat;
 all_ftypes = Tdata.all_ftypes;
-[featcount, ~]= size(fmat);gi
+[featcount, ~]= size(fmat);
 % Feature responses
 fw = fmat * Tdata.ii_ims;
 
