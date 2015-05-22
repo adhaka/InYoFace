@@ -8,13 +8,12 @@ face_ii = LoadImDataDir(facesDir);
 nonface_ii = LoadImDataDir(nonfacesDir);
 
 all_images = [face_ii, nonface_ii];
-size(all_images)
+
 total_ims = size(all_images, 2);
 face_ims = size(face_ii, 2);
 targets = ones(1, total_ims);
 
 targets(face_ims+1:end) = -1; % targets of non images are -1
-size(targets)
 
 train_inds = Tdata.train_inds;
 total_inds = 1:total_ims;
@@ -24,8 +23,6 @@ test_inds = setdiff(total_inds, train_inds);
 test_images = all_images( :, test_inds);
 test_targets = targets(:, test_inds);
 
-disp(size(test_targets));
-disp(size(test_images));
 scores= ApplyDetector(Cparams, test_images);
 
 Threshold = -100:0.01:100;
@@ -42,10 +39,10 @@ for t = 1:size(Threshold,2)
     fpr = fp/(fp+tn);
     tprVec(t) = tpr;
     fprVec(t) = fpr;
-%     if tpr > 0.7
-%         tpr
-%         Threshold(t)
-%     end
+    if tpr > 0.7
+        tpr
+        Threshold(t)
+    end
 end
 
 plot(fprVec, tprVec)

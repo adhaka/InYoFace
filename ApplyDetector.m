@@ -11,7 +11,6 @@ psmat = repmat(ps, 1, numIms);
 Thetamat = repmat(ps .* Thetas, 1, numIms);
 Alphamat = repmat(Alphas, 1, numIms);
 
-
 hs =  Alphamat .* ((psmat .* (fmat * ii_ims) < Thetamat) * 2  - 1);
 scs = sum(hs);  
 
