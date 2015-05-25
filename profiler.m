@@ -14,7 +14,7 @@ profile clear
 profile on
 
 tic
-Eparams = BoostingAlgMat(Tdata, 100);
+Eparams = BoostingAlgMat(Tdata, 10);
 toc
 profile viewer
 p = profile('info');

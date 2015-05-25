@@ -5,7 +5,9 @@ nd = size(dets,1);
 intersectionArea = rectint(dets,dets);
 % unions
 detArea = dets(:,3).*dets(:,4);
-unionArea = repmat(detArea,1,nd) + repmat(detArea',nd,1).*(intersectionArea>0) - intersectionArea;
+% this is also wrong
+unionArea = repmat(detArea,1,nd) + repmat(detArea',nd,1) - intersectionArea ;
+%unionArea = repmat(detArea,1,nd) + repmat(detArea',nd,1).*(intersectionArea>0) - intersectionArea;
 % overlappers
 D = ( intersectionArea ./ unionArea ) > rho;
 [S, C] = graphconncomp(sparse(D));

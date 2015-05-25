@@ -5,7 +5,7 @@ Tdata = load('training_data');
 ComputeROC(Dparams, Tdata);
 title('ROC')
 
-Dparams.thresh = 4.3400;
+Dparams.thresh = 4.3400; % threshold for 70 percent
 
 %% test image
 im = imread('data/TestImages/big_one_chris.png');
@@ -50,7 +50,7 @@ ims{3} = imread('data/TestImages/IMG_0181.jpg');
 ims{4} = imread('data/TestImages/facepic2.jpg');
 for i=1:4
     tic
-    dets = ParScanImageOverScale(Dparams, ims{i}, 0.6, 1.3, 0.06);
+    dets = ParScanImageOverScale(Dparams, ims{i}, 0.4, 1.3, 0.06);
     toc
     figure
     DisplayDetections(ims{i}, dets);
