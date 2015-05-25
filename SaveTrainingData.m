@@ -3,12 +3,16 @@ function SaveTrainingData(all_ftypes, train_inds, s_fn, varargin)
 facesDir = 'data/TrainingImages/FACES/';
 nonfacesDir = 'data/TrainingImages/NFACES/';
 
+%%%%%%%
+% THIS SHOULD BE SENT AS PARAMETER!!!!
+%%%%%%%
+
 % new training indices for additional training will use about 9000 training
 % examples in place of just 6000.
 
-x = 3:3:12000;
-tot_inds = 1:1:12000;
-train_inds = setdiff(tot_inds, x);
+%x = 3:3:12000;
+%tot_inds = 1:1:12000;
+%train_inds = setdiff(tot_inds, x);
 
 %
 
