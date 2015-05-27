@@ -8,12 +8,14 @@ train_inds = 1:2:13954;  % every other photo in training images
 all_ftypes = EnumAllFeatures(19,19);
 SaveTrainingData(all_ftypes, train_inds, 'simple_cascade_training_data.mat');
 
+
 %%
 facesDir = 'data/TrainingImages/FACES/';
 nonfacesDir = 'data/TrainingImages/NFACES/';
 faces = LoadImDataDir(facesDir);
 non_faces = LoadImDataDir(nonfacesDir);
 all_images = [faces, non_faces];
+
 
 %% Define parameters
 % Number of stages in the classifier.
@@ -51,6 +53,7 @@ i=0;
 thresholds = ones(stages,1)*20;
 D = ones(stages,1);
 F = ones(stages,1);
+
 % while F > Ftarget
 for j=1:10
     i=i+1;
@@ -70,6 +73,7 @@ for j=1:10
     tn = sum(preds == -1 & val_targets == -1);
     fp = sum(preds == 1 & val_targets == -1);
     fn = sum(preds == -1 & val_targets == 1);
+
     tpr = tp/(tp+fn);
     fpr = fp/(fp+tn);
     if i==1
@@ -91,6 +95,7 @@ for j=1:10
         tn = sum(preds == -1 & val_targets == -1);
         fp = sum(preds == 1 & val_targets == -1);
         fn = sum(preds == -1 & val_targets == 1);
+
         tpr = tp/(tp+fn);
         fpr = fp/(fp+tn);
         if i==1
@@ -130,6 +135,7 @@ for j=1:10
     fpinds = val_inds(val_targets == -1 & preds == 1);
     Tdata.ii_ims = [ims, all_images(fpinds)];
     Tdata.train_inds = [Tdata.train_inds, fpinds];
+
 end
 
 
