@@ -8,13 +8,16 @@ train_inds = 1:2:13954;  % every other photo in training images
 all_ftypes = EnumAllFeatures(19,19);
 SaveTrainingData(all_ftypes, train_inds, 'simple_cascade_training_data.mat');
 
-
 %%
+
 facesDir = 'data/TrainingImages/FACES/';
 nonfacesDir = 'data/TrainingImages/NFACES/';
 faces = LoadImDataDir(facesDir);
 non_faces = LoadImDataDir(nonfacesDir);
-all_images = [faces, non_faces];
+
+
+num_faces = size(faces,2);
+num_non_faces = size(non_faces,2);
 
 
 %% Define parameters
@@ -39,103 +42,55 @@ Tdata = load('simple_cascade_training_data.mat');
 
 %% Do the training
 
-% Set of positive and negative examples
-P = Tdata.ii_ims(Tdata.ys == 1);
-N = Tdata.ii_ims(Tdata.ys == -1);
-
 % Cascade
-cascade = cell(stages,1);
+cascade = cell(stages+1,1);
 
 % Initial values for dr and fpr
-D0 = 1;
-F0 = 1;
-i=0;
-thresholds = ones(stages,1)*20;
-D = ones(stages,1);
-F = ones(stages,1);
 
+i=1;
+thresholds = ones(stages+1,1);
+D = ones(stages+1,1);
+F = ones(stages+1,1);
+D(1) = 1;
+F(1) = 1;
 % while F > Ftarget
 for j=1:10
-    i=i+1;
+    
+    i=i+1
     n = 0;
-    if i==1
-        F(i) = F0;
-    else
-        F(i) = F(i-1);
-    end
+    F(i) = F(i-1);
     
     % This should later be inside a loop to select number of features
-    cascade{i} = BoostingAlgMat(Tdata, nrf);
+    %---------- start loop ----------
+    cascade{i} = BoostingAlg(Tdata, nrf);
     scores = ApplyDetector(cascade{i}, val_images);
+    thresholds(i) = max(scores);
+    [tpr, fpr] = getRates(scores, val_targets, thresholds(i));
     
-    preds = (scores > thresholds(i))*2 -1;
-    tp = sum(preds == 1 & val_targets == 1);
-    tn = sum(preds == -1 & val_targets == -1);
-    fp = sum(preds == 1 & val_targets == -1);
-    fn = sum(preds == -1 & val_targets == 1);
-
-    tpr = tp/(tp+fn);
-    fpr = fp/(fp+tn);
-    if i==1
-        D(i) = D0*tpr;
-    else
-        D(i) = D(i-1)*tpr;
-    end
-    
-    if i==1
-        condition = d;
-    else
-        condition = D(i-1)*d;
-    end
+    D(i) = D(i-1)*tpr;
+    condition = D(i-1)*d;
     
     while D(i) < condition
         thresholds(i) = thresholds(i)-0.01;
-        preds = (scores > thresholds(i))*2 -1;
-        tp = sum(preds == 1 & val_targets == 1);
-        tn = sum(preds == -1 & val_targets == -1);
-        fp = sum(preds == 1 & val_targets == -1);
-        fn = sum(preds == -1 & val_targets == 1);
-
-        tpr = tp/(tp+fn);
-        fpr = fp/(fp+tn);
-        if i==1
-            D(i) = tpr;
-        else
-            D(i) = D(i-1)*tpr;
-        end
+        [tpr, fpr] = getRates(scores, val_targets, thresholds(i));
+        D(i) = D(i-1)*tpr;
     end
-    
-    if i==1
-        F(i)=F0*fpr;
-    else
-        F(i) = F(i-1)*fpr;
-    end
-    % prune the training images
-    % N <- O
-    
+    F(i) = F(i-1)*fpr;
+    %---------- end loop ----------
+    cascade{i}.thresh = thresholds(i);
     % evaluate the current cascade on non face images
-    for params in cascade
-        scores = ApplyDetector(cascade{i}, non_faces);
+    predictions = ones(1,num_non_faces);
+    for c=2:i % run through the cascade
+        scores = ApplyDetector( cascade{i}, non_faces );
+        predictions = predictions & ( scores > thresholds(c) );
     end
     
-    % add the false positive to the training images
-    preds = (scores > thresholds(i))*2 -1;
-    fpinds = find(preds == 1) + size(faces,2);
-    
-    
-    
-    
-    
-    ims = Tdata.ii_ims(Tdata.ys == 1);
-    Tdata.ii_ims = [ims, all_images(fpinds)];
-    
-    all_inds = 1:13954; % don't hardcode like this
-    train_inds = Tdata.train_inds;
-    val_inds;
-    fpinds = val_inds(val_targets == -1 & preds == 1);
-    Tdata.ii_ims = [ims, all_images(fpinds)];
-    Tdata.train_inds = [Tdata.train_inds, fpinds];
-
+    % Append the misclassified non faces to the faces and add the training
+    % indices which might be uneccessary.
+    Tdata.ii_ims = [ faces(:,1:2:num_of_faces), non_faces(:,predictions) ];
+    Tdata.train_inds = [ 1:2:num_of_faces,  find(predictions) + num_of_faces];
+    Tdata.ys = [ones(1,length(1:2:num_of_faces)), -ones(1,sum(predictions))];
+    [val_images, val_inds, val_targets] = getValidationData(Tdata);
 end
 
 

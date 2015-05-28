@@ -38,8 +38,8 @@ colormap gray;
 dinfo6 = load('data/DebugInfo/debuginfo7.mat');
 T = dinfo6.T;
 Cparams = BoostingAlg(Tdata, T);
-sum(abs(dinfo6.alphas - Cparams.alphas) > 0.001)
-sum(abs(dinfo6.Thetas(:) - Cparams.Thetas(:)) > 0.001)
+sum(abs(dinfo6.alphas - Cparams.alphas) > 0.000001)
+sum(abs(dinfo6.Thetas(:) - Cparams.Thetas(:)) > 0.000001)
 %%
 fims = cell(11, 1);
 for i = 1:10
