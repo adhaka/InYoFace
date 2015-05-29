@@ -45,3 +45,12 @@ toc
 profile viewer
 p = profile('info');
 profsave(p,'profile_results')
+%%
+profile clear
+profile on
+tic
+dets = CascadeScanImageOverScale(c.casc,im,0.6,1.3,0.06);
+toc
+profile viewer
+p = profile('info');
+profsave(p,'profile_results')

@@ -36,6 +36,7 @@ nrf = 20;
 
 %% Prepare the validation set
 Tdata = load('simple_cascade_training_data.mat');
+Tdata = load('training_data.mat');
 
 [val_images, val_inds, val_targets] = getValidationData(Tdata);
 
@@ -55,8 +56,7 @@ D(1) = 1;
 F(1) = 1;
 % while F > Ftarget
 for j=1:10
-    
-    i=i+1
+    i=i+1;
     n = 0;
     F(i) = F(i-1);
     
@@ -79,18 +79,22 @@ for j=1:10
     %---------- end loop ----------
     cascade{i}.thresh = thresholds(i);
     % evaluate the current cascade on non face images
-    predictions = ones(1,num_non_faces);
+    predictions = ones(1,length(val_targets));
     for c=2:i % run through the cascade
-        scores = ApplyDetector( cascade{i}, non_faces );
+        scores = ApplyDetector( cascade{c}, val_images );
         predictions = predictions & ( scores > thresholds(c) );
     end
     
     % Append the misclassified non faces to the faces and add the training
     % indices which might be uneccessary.
-    Tdata.ii_ims = [ faces(:,1:2:num_of_faces), non_faces(:,predictions) ];
-    Tdata.train_inds = [ 1:2:num_of_faces,  find(predictions) + num_of_faces];
-    Tdata.ys = [ones(1,length(1:2:num_of_faces)), -ones(1,sum(predictions))];
-    [val_images, val_inds, val_targets] = getValidationData(Tdata);
+    fpinds = val_targets==-1 & predictions;
+    sum(fpinds)
+    Tdata.ii_ims = [ faces(:,1:2:num_faces), val_images(:,fpinds) ];
+    Tdata.train_inds = [ 1:2:num_faces,  val_inds(fpinds) ];
+    Tdata.ys = [ ones(1,length(1:2:num_faces)), -ones(1,sum(fpinds)) ];
+    Tdata
+    
+    %[val_images, val_inds, val_targets] = getValidationData(Tdata);
 end
 
 

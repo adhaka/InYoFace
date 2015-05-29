@@ -26,7 +26,7 @@ ys = ys';
 ysp = (1+ys);
 ysn = (1-ys);
 for t = 1:T
-    t
+    
     for j = 1:featcount
         fs = fw(:,j);
          
